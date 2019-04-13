@@ -1,0 +1,42 @@
+
+h2 {
+	position: relative ;
+	margin: 50px 0 40px 0 ;
+	font-size: 30px ;
+	font-weight: normal ;
+	line-height: 1.5 ;
+	letter-spacing: 0.05em ;
+	color: #000000 ;
+}
+h2:before {
+	content: "" ;
+	position: absolute ;
+	bottom: -14px ;
+	width: 70px ;
+	border-bottom: 3px solid #d23d2a ;
+}
+h2 a:link,
+h2 a:visited {
+	text-decoration: none;
+}
+h2.center {
+	position: relative ;
+	margin: 40px 0 ;
+	font-size: 30px ;
+	font-weight: normal ;
+	line-height: 1.5 ;
+	letter-spacing: 0.05em ;
+	text-align: center ;
+}
+h2.center:before {
+	content: "" ;
+	position: absolute ;
+	left: 50% ;
+	bottom: -14px ;
+	width: 70px ;
+	margin: 0 0 0 -35px ;
+	border-bottom: 3px solid #d23d2a ;
+}
+h2:first-child {
+	margin: 0 0 40px 0 ;
+}
