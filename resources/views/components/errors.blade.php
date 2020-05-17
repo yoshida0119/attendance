@@ -1,7 +1,7 @@
 {{--
     @使用方法
         下記をbladeから呼び出し
-        @component('components.errors',['type_message'=>'エラー'])
+        @component('components.errors')@endcomponent
           ログイン情報が間違っています。
         @endcomponent
 --}}

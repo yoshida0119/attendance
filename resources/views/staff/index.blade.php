@@ -21,7 +21,6 @@
             </thead>
             <tbody>
                 @foreach ($staff as $item)
-
                 <tr  class="d-flex align-items-center">
                     <td class="col-sm-1">
                         <a href="{{ url('staff/' . $item->id . '/edit') }}">
