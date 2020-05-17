@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Services\DateService;
 use App\Staff;
 use App\Time;
+use Carbon\Carbon;
 use DB;
 use App\Facades\Date;
 use phpDocumentor\Reflection\Types\Boolean;
@@ -24,12 +25,8 @@ class TimeService {
      */
     public function getTodayStaff()
     {
-        //今日の日付取得
-        $today = $this->dateService->getToday();
-
-        $timeModel = new Time;
-        $todayStaff = $timeModel->with('staff')->where('work_dt',$today)->get();
-        return $todayStaff;
+        return Time::with('staff')->where(
+            'work_dt',$this->dateService->getToday())->get();
     }
 
     /**
@@ -37,8 +34,7 @@ class TimeService {
      * @return void
      */
     public function getMonthlyWorkSchdule(String $targetYear, String $targetMonth){
-        $staff = Time::where('work_dt', 'like', '%' . $targetYear . '-' . $targetMonth . '%')->get();
-        return $staff;
+        return Time::where('work_dt', 'like', '%' . $targetYear . '-' . $targetMonth . '%')->get();
     }
 
     /**
@@ -46,50 +42,25 @@ class TimeService {
      * @return Class 指定日から一週間分の出勤情報
      */
     public function selectScheduleForOneWeek($targetDay){
-        //最終日
-        $startDay = $targetDay;
-        $targetDay = strtotime($targetDay);
-        //一週間後の日付
-        $endDay = date('Y-m-d', strtotime('+7 days', $targetDay));
-
-        return Time::whereBetween('work_dt',array($startDay, $endDay));
+        $endDay = date('Y-m-d', strtotime('+7 days', strtotime($targetDay)));
+        return Time::whereBetween('work_dt',array(strtotime($targetDay), $endDay));
     }
 
     /**
-     * 対象スタッフの一週間分の勤務スケジュール取得
+     * 対象スタッフの今日から一週間分の勤務スケジュール取得
      * @param String $id スタッフID
      * @param Class $request
      * @return Array $time
      */
     public function selectStaffSchedule($id, $request){
-        //スタッフ情報取得
-        $staff = Staff::where('id',$id)->first();
-        //勤務情報取得
-        $tmpTime  = Time::where('staff_id',$id);
-
-        //一週間分の勤務情報を格納してviewへ渡す
-        $time = array();
-        for ($i = 0; $i <= 6; $i++){
-            //クラスを直接触ると値が変わるためクローン作成
-            $timeClass = clone $tmpTime;
-            //今日から順に+1した日付を取得
-            $time[$i]['work_dt'] = date("Y-m-d" , strtotime('+' . $i . ' day'));
-            if($timeClass->where('work_dt',$time[$i]['work_dt'])->count() > 0){
-                //対象の日付が出勤日の場合
-                $timeClass = $timeClass->where('work_dt',$time[$i]['work_dt'])->first();
-                $time[$i]['start_time'] = $timeClass->start_time;
-                $time[$i]['end_time'] = $timeClass->end_time;
-            }else{
-                //出勤日でない場合
-                $time[$i]['start_time'] = "";
-                $time[$i]['end_time']   = "";
-            }
-        }
-        return $time;
+        $toDay = Carbon::today()->format('Y/m/d');
+        $endDay = Carbon::today()->addDay(7)->format('Y/m/d');
+        return Time::select(['work_dt', 'start_time', 'end_time'])
+            ->where('staff_id',$id)->whereBetween('work_dt', [$toDay, $endDay])->get();
     }
 
     /**
-     * 複数ユーザーの一週間分スケジュールisert
+     * 複数ユーザーの一週間分スケジュールinsert
      * @return void
      */
     public function insertMultiStaffScheduleForWeek($request){
