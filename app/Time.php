@@ -19,7 +19,7 @@ class Time extends Model
      */
     public function staff()
     {
-        //where dept_id
+        //where dept_idT
         return $this->belongsTo('App\Staff');
     }
 
